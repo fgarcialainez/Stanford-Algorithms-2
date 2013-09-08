@@ -28,6 +28,16 @@
  */
 package com.stanford.algorithms.parttwo.weekone;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Algorithms: Design and Analysis, Part 2
  * Programming Question - Week 1
@@ -35,10 +45,144 @@ package com.stanford.algorithms.parttwo.weekone;
  */
 public class Question3 
 {
+    private static int[][] graph = null;
+    private static int numberOfNodes = 0;
+    private static int[] spanningTree = null;
+    private static boolean[] expandedNodes = null;
+    
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public static void main(String[] args)
+    {
+        //READ THE GRAPH
+        readGraphFromFile();
+        
+        System.out.println("*** Overall Cost => " + primMSTAlgorithm() + " ***");
+    }
+    
+    /**
+     * Running time O(mn)
+     */
+    private static int primMSTAlgorithm()
+    {
+	int overallCost = 0;
+        
+        expandedNodes[0] = true;
+
+	int minimumCost = Integer.MAX_VALUE;
+		
+        int minimumI =0 ;
+	int minimumJ = 0;
+		
+        while(!allNodesExpanded())
+        {
+            for(int i = 0; i < numberOfNodes; i++)
+            {
+		if(!expandedNodes[i])
+                {
+                    for(int j = 0; j < numberOfNodes; j++)
+                    {
+                        if(expandedNodes[j])
+                        {
+                            if(minimumCost > graph[i][j])
+                            {
+                                minimumCost = graph[i][j];
+                                minimumI = i;
+                                minimumJ = j;
+                            }					
+                        }
+                    }
+                }
+            }
+			
+            expandedNodes[minimumI] = true;
+            spanningTree[minimumJ] = minimumI;
+            overallCost += graph[minimumI][minimumJ];
+            minimumCost = Integer.MAX_VALUE;
+	}
+
+        return overallCost;
+    }
+    
+    private static boolean allNodesExpanded()
+    {
+        boolean allExpanded = true;
+        
+	for(boolean expanded : expandedNodes)
+        {
+            if(!expanded)
+            {
+                allExpanded = false;
+                break;
+            }
+	}
+	
+        return allExpanded;
+    }
+    
+    /**
+     * Reads the Job list 
+     * @return A list of jobs 
+     */
+    private static void readGraphFromFile()
+    {
+        FileInputStream fstream = null;
+        try {
+            fstream = new FileInputStream("edges.txt");
+            
+            // Get the object of DataInputStream
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            
+            String line = br.readLine();
+            StringTokenizer tokens = new StringTokenizer(line);
+            numberOfNodes = Integer.parseInt(tokens.nextToken());
+             
+            //INITIALIZE THE GRAPH
+            graph = new int[numberOfNodes][numberOfNodes];
+            for (int i = 0; i < numberOfNodes; i++){
+		for(int j = 0; j < numberOfNodes; j++){
+                    graph[i][j] = Integer.MAX_VALUE;
+                }
+            }
+            
+            while ((line = br.readLine()) != null)
+            {
+                // process the line
+                tokens = new StringTokenizer(line);
+                
+                String firstToken = tokens.nextToken();
+                String secondToken = tokens.nextToken();
+                String thirdToken = tokens.nextToken();
+                
+                int i = Integer.parseInt(firstToken) - 1;
+		int j = Integer.parseInt(secondToken) - 1;
+		graph[i][j] = Integer.parseInt(thirdToken);
+		graph[j][i] = Integer.parseInt(thirdToken);  
+            }
+                     
+            spanningTree = new int[numberOfNodes];
+            for(int i = 0; i < numberOfNodes; i++){
+		spanningTree[i] = -1;
+            }
+            
+            expandedNodes = new boolean[numberOfNodes];	
+            for(int i = 0; i < numberOfNodes; i++){
+                expandedNodes[i] = false;
+            }
+            
+            br.close();
+        }catch (FileNotFoundException ex) {
+            Logger.getLogger(Question1.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (IOException ex) {
+            Logger.getLogger(Question1.class.getName()).log(Level.SEVERE, null, ex);
+        }finally {
+            try {
+                fstream.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Question1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
