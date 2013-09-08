@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,8 +48,7 @@ public class Question3
 {
     private static int[][] graph = null;
     private static int numberOfNodes = 0;
-    private static int[] spanningTree = null;
-    private static boolean[] expandedNodes = null;
+    private static HashMap<Integer, ExpandedNode> spanningTree = new HashMap<Integer, ExpandedNode>();
     
     /**
      * @param args the command line arguments
@@ -67,8 +67,9 @@ public class Question3
     private static int primMSTAlgorithm()
     {
 	int overallCost = 0;
-        
-        expandedNodes[0] = true;
+        int position = 0;
+       
+        spanningTree.put(0, new ExpandedNode(0, position));
 
 	int minimumCost = Integer.MAX_VALUE;
 		
@@ -79,11 +80,11 @@ public class Question3
         {
             for(int i = 0; i < numberOfNodes; i++)
             {
-		if(!expandedNodes[i])
+		if(isNodeExpanded(i))
                 {
                     for(int j = 0; j < numberOfNodes; j++)
                     {
-                        if(expandedNodes[j])
+                        if(!isNodeExpanded(j))
                         {
                             if(minimumCost > graph[i][j])
                             {
@@ -95,9 +96,8 @@ public class Question3
                     }
                 }
             }
-			
-            expandedNodes[minimumI] = true;
-            spanningTree[minimumJ] = minimumI;
+		
+            spanningTree.put(minimumJ, new ExpandedNode(minimumJ, position));
             overallCost += graph[minimumI][minimumJ];
             minimumCost = Integer.MAX_VALUE;
 	}
@@ -105,20 +105,12 @@ public class Question3
         return overallCost;
     }
     
-    private static boolean allNodesExpanded()
-    {
-        boolean allExpanded = true;
-        
-	for(boolean expanded : expandedNodes)
-        {
-            if(!expanded)
-            {
-                allExpanded = false;
-                break;
-            }
-	}
-	
-        return allExpanded;
+    private static boolean allNodesExpanded(){
+        return (spanningTree.size() == numberOfNodes);
+    }
+    
+    private static boolean isNodeExpanded(int index){   
+        return (spanningTree.get(index) != null);
     }
     
     /**
@@ -161,16 +153,6 @@ public class Question3
 		graph[i][j] = Integer.parseInt(thirdToken);
 		graph[j][i] = Integer.parseInt(thirdToken);  
             }
-                     
-            spanningTree = new int[numberOfNodes];
-            for(int i = 0; i < numberOfNodes; i++){
-		spanningTree[i] = -1;
-            }
-            
-            expandedNodes = new boolean[numberOfNodes];	
-            for(int i = 0; i < numberOfNodes; i++){
-                expandedNodes[i] = false;
-            }
             
             br.close();
         }catch (FileNotFoundException ex) {
@@ -184,5 +166,36 @@ public class Question3
                 Logger.getLogger(Question1.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+}
+
+/**
+ * This class represents a node
+ */
+class ExpandedNode
+{
+    private int nodeIndex; //the index of the node in the initial nodes array
+    private int position; //the position in the spanning tree
+    
+    public ExpandedNode(int nodeIndex, int position){
+        super();
+        this.nodeIndex = nodeIndex;
+        this.position = position;
+    }
+    
+    public int getNodeIndex(){
+        return nodeIndex;
+    }
+    
+    public void setNodeIndex(int nodeIndex){
+        this.nodeIndex = nodeIndex;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
