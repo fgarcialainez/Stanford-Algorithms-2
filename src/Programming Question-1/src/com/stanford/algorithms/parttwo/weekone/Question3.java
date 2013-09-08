@@ -72,7 +72,7 @@ public class Question3
 
 	int minimumCost = Integer.MAX_VALUE;
 		
-        int minimumI =0 ;
+        int minimumI = 0;
 	int minimumJ = 0;
 		
         while(!allNodesExpanded())
