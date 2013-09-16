@@ -75,11 +75,8 @@ public class Question2
             value++;
         }
         
-        
         QuickUnionPathCompressionUF unionFind = new QuickUnionPathCompressionUF(numberOfNodes);
         
-        // Iterate of array of sequences, compute similar pairs for each and see
-        // if any of the similar pairs match other sequences. If they do, union them
         for(String key : nodesMap.keySet()) 
         {
             String[] closeNodes = getCloseNodes(key);
