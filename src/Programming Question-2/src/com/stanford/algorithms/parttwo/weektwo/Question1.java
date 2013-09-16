@@ -25,6 +25,15 @@
  */
 package com.stanford.algorithms.parttwo.weektwo;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
+
 /**
  * Algorithms: Design and Analysis, Part 2
  * Programming Question - Week 2
@@ -32,11 +41,139 @@ package com.stanford.algorithms.parttwo.weektwo;
  */
 public class Question1
 {
+    private static int k = 4;
+    private static int numberOfEdges = 0;
+    private static int[] parents;
+	
     /**
-     * @param args the command line arguments
+     * @param args
      */
-    public static void main(String[] args)
+    public static void main(String[] args) 
     {
+        List<Edge> edgesArray = readEdgesArrayFromFile();
         
+        Collections.sort(edgesArray);
+        
+        QuickUnionPathCompressionUF unionFind = new QuickUnionPathCompressionUF(numberOfEdges);
+        
+        for(Edge e : edgesArray)
+        {
+            unionFind.union(e.getI(), e.getJ());
+ 				
+            if(unionFind.count() == k){
+                break;				
+            }
+        }
+        
+        int max = Integer.MAX_VALUE;
+			
+        for(Edge e : edgesArray)
+        {
+            if(unionFind.find(e.getI()) != unionFind.find(e.getJ())){
+                max = Math.min(max, e.getCost());				
+            }
+	}
+	
+        System.out.println("Max-Spacing K-Clustering => " + max);
+    }
+    
+    /**
+     * Read the data of the Graph to be used in the assignment
+     * @return A list of Edge 
+     */
+    private static ArrayList<Edge> readEdgesArrayFromFile()
+    {
+        ArrayList<Edge> edgesArray;
+        
+        try
+        {
+            FileInputStream f = new FileInputStream("clustering1.txt");
+            DataInputStream d = new DataInputStream(f);
+            BufferedReader b =  new BufferedReader(new InputStreamReader(d));
+            
+            numberOfEdges = Integer.parseInt(b.readLine());
+            edgesArray = new ArrayList<Edge>(numberOfEdges);
+            
+            parents = new int[numberOfEdges];			
+
+            for(int i = 0; i < numberOfEdges; i++){
+                parents[i] = -1;				
+            }
+            
+            String str; 
+            StringTokenizer tokenizer;
+            int i, j, v;
+			
+            while((str=b.readLine())!=null)
+            {
+                tokenizer = new StringTokenizer(str);
+                
+		i = Integer.parseInt(tokenizer.nextToken());
+		j = Integer.parseInt(tokenizer.nextToken());
+		v = Integer.parseInt(tokenizer.nextToken());
+		edgesArray.add(new Edge(i - 1, j - 1, v));
+            }
+        }
+        catch(Exception ex){
+            edgesArray = new ArrayList<com.stanford.algorithms.parttwo.weektwo.Edge>();
+        } 
+        
+        return edgesArray;
+    }
+}	
+
+/**
+ * Represents an Edge of the Graph
+ */
+class Edge implements Comparable<Edge>
+{
+    private int i;
+    private int j;
+    private int cost;
+		
+    public Edge(int i, int j, int cost)
+    {
+	this.i = i;
+	this.j = j;
+	this.cost = cost;
+    }
+
+    public int getI() {
+        return i;
+    }
+
+    public void setI(int i) {
+        this.i = i;
+    }
+
+    public int getJ() {
+        return j;
+    }
+
+    public void setJ(int j) {
+        this.j = j;
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+    
+    @Override
+    public int compareTo(Edge edge) 
+    {
+        int result;
+        
+        if(this.getCost() >= edge.getCost()){
+            result = 1;
+        }
+        else{
+            result = -1;
+        }
+        
+        return result;
     }
 }
