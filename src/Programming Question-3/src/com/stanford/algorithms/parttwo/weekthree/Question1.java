@@ -45,17 +45,17 @@ public class Question1
      */
     public static void main(String[] args) 
     {
-        //LOAD DATA FROM FILE
+        //Load data from file
         loadDataFromFile();
         
-        //INITIALIZATION
+        //Initialization
         int[][] A = new int[n + 1][w + 1];
         
         for(int j = 0; j <= w; j++){
             A[0][j] = 0;
         }
         
-        //MAIN LOOP
+        //Main Loop
         for(int i = 1; i <= n; i++)
         {
             KnapsackItem currentItem = itemsArray.get(i - 1);

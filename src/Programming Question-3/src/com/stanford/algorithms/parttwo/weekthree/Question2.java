@@ -56,10 +56,10 @@ public class Question2
      */
     public static void main(String[] args) 
     {
-        //LOAD DATA FROM FILE
+        //Load data from file
         loadDataFromFile();
         
-        //RECURSIVE IMPLEMENTATION
+        //Recursive Implementation
         System.out.println("*** Optimal Solution => " + processKnapsack(itemsArray.size() - 1, w) + " ***");
     }
     
@@ -68,10 +68,10 @@ public class Question2
      */
     private static int processKnapsack(int i, int w)
     {
-        //READ SOLUTION FROM CACHE
+        //Read solution from cache
         int solution = getSolutionFromCache(i, w);
         
-        //IF THE SOLUTION FOR THE VALUES OF i AND w DOESN'T EXISTS THEN COMPUTE IT 
+        //If the solution for the values i and w doesn't exists then compute it recursively
         if(solution == -1)
         {
             if(i < 0){
@@ -87,7 +87,7 @@ public class Question2
                 solution = Math.max(processKnapsack(i - 1, w), processKnapsack(i - 1, w - currentItem.getWeight()) + currentItem.getValue());   
             }
         
-            //SAVE THE CALCULATED SOLUTION IN THE CACHE
+            //Save the calculated solution in the cache
             saveSolutionInChache(i, w, solution);
         }   
             
