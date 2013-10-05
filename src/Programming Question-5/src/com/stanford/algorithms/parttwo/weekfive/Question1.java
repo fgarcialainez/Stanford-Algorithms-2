@@ -51,8 +51,8 @@ public class Question1
     // cost matrix
     static double[][] costMatrix;
   
-    static double[][] costWithPi;
-    static Node bestNode = new Node();
+    static double[][] costMatrixWithPi;
+    static Node finalNode = new Node();
   
     /**
      * Main Method
@@ -126,10 +126,10 @@ public class Question1
      */
     private static double processTSP() 
     {
-        bestNode.lowerBound = Double.MAX_VALUE;
+        finalNode.lowerBound = Double.MAX_VALUE;
         Node currentNode = new Node();
         currentNode.excluded = new boolean[nCities][nCities];
-        costWithPi = new double[nCities][nCities];
+        costMatrixWithPi = new double[nCities][nCities];
         currentNode.computeHeldKarp();
         
         PriorityQueue<Node> pq = new PriorityQueue<Node>(nCities, new NodeComparator());
@@ -145,8 +145,8 @@ public class Question1
                 }
                 
                 if(i < 0){
-                    if(currentNode.lowerBound < bestNode.lowerBound) {
-                        bestNode = currentNode;
+                    if(currentNode.lowerBound < finalNode.lowerBound) {
+                        finalNode = currentNode;
                     }
                     break;
                 }
@@ -163,12 +163,12 @@ public class Question1
                 
                 currentNode = children.poll();
                 pq.addAll(children);
-            } while(currentNode.lowerBound < bestNode.lowerBound);
+            } while(currentNode.lowerBound < finalNode.lowerBound);
             
             currentNode = pq.poll();
-        } while (currentNode != null && currentNode.lowerBound < bestNode.lowerBound);
+        } while (currentNode != null && currentNode.lowerBound < finalNode.lowerBound);
         
-        return bestNode.lowerBound;
+        return finalNode.lowerBound;
     }
     
     /**
@@ -197,7 +197,7 @@ public class Question1
                 double previousLowerBound = this.lowerBound;
                 computeOneTree();
                 
-                if(!(this.lowerBound < bestNode.lowerBound)) {
+                if(!(this.lowerBound < finalNode.lowerBound)) {
                     return;
                 }
                 
@@ -243,7 +243,7 @@ public class Question1
         private void addEdge(int i, int j)
         {
             double q = this.lowerBound;
-            this.lowerBound += costWithPi[i][j];
+            this.lowerBound += costMatrixWithPi[i][j];
             this.degree[i]++;
             this.degree[j]++;
         }
@@ -255,7 +255,7 @@ public class Question1
             Arrays.fill(this.degree, 0);
             for (int i = 0; i < nCities; i++) {
                 for (int j = 0; j < nCities; j++) {
-                    costWithPi[i][j] = this.excluded[i][j] ? Double.MAX_VALUE : costMatrix[i][j] + this.pi[i] + this.pi[j];
+                    costMatrixWithPi[i][j] = this.excluded[i][j] ? Double.MAX_VALUE : costMatrix[i][j] + this.pi[i] + this.pi[j];
                 }
             }
 
@@ -263,7 +263,7 @@ public class Question1
             int secondNeighbor;
 
             // find the two cheapest edges from 0
-            if (costWithPi[0][2] < costWithPi[0][1]) {
+            if (costMatrixWithPi[0][2] < costMatrixWithPi[0][1]) {
                 firstNeighbor = 2;
                 secondNeighbor = 1;
             } else {
@@ -272,8 +272,8 @@ public class Question1
             }
 
             for (int j = 3; j < nCities; j++) {
-                if (costWithPi[0][j] < costWithPi[0][secondNeighbor]) {
-                    if (costWithPi[0][j] < costWithPi[0][firstNeighbor]) {
+                if (costMatrixWithPi[0][j] < costMatrixWithPi[0][secondNeighbor]) {
+                    if (costMatrixWithPi[0][j] < costMatrixWithPi[0][firstNeighbor]) {
                         secondNeighbor = firstNeighbor;
                         firstNeighbor = j;
                     } else {
@@ -287,7 +287,7 @@ public class Question1
             this.parent[firstNeighbor] = 0;
 
             //compute the minimum spanning tree on nodes 1..n-1
-            double[] minCost = costWithPi[firstNeighbor].clone();
+            double[] minCost = costMatrixWithPi[firstNeighbor].clone();
 
             for (int k = 2; k < nCities; k++) {
                 int i;
@@ -305,8 +305,8 @@ public class Question1
 
                 addEdge(this.parent[i], i);
                 for (int j = 1; j < nCities; j++) {
-                    if (this.degree[j] == 0 && costWithPi[i][j] < minCost[j]) {
-                        minCost[j] = costWithPi[i][j];
+                    if (this.degree[j] == 0 && costMatrixWithPi[i][j] < minCost[j]) {
+                        minCost[j] = costMatrixWithPi[i][j];
                         this.parent[j] = i;
                     }
                 }
